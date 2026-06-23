@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CE_4.1_por vb</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="estudo-de-caso-4.1">Estudo de caso 4.1</h1>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<h2 id="sistema-de-recomendação-de-filmes">Sistema de recomendação de filmes</h2>
+<h3 id="instruções-de-execução">Instruções de execução</h3>
+<blockquote>
+<h4 id="google-colab">Google Colab</h4>
+<p>Lembre-se de que este é um dos dois estudos de caso avaliativos do curso. Para executar o estudo de caso em Python sem precisar instalar um programa/arquivo em seu computador, realize o estudo no ambiente do Google Colab:</p>
+<ol>
+<li>Para este estudo, há dois <em>notebooks</em> do Google Colab à sua disposição. De acordo com seu nível prévio de programação, selecione a versão <em>iniciante</em> ou <em>avançado</em>:</li>
+</ol>
+<blockquote>
+<ul>
+<li><a href="https://drive.google.com/file/d/1ie1GfaDP5fjhpzE68ysxek_xTEubvn4k/view?usp=sharing">CE_4.1_iniciante.ipynb</a>  (para pessoas sem experiência prévia em programação)</li>
+<li><a href="https://drive.google.com/file/d/168uU2ZZen1tDj6ilAauTLHnR1ddSVbNA/view?usp=sharing">CE_4.1_avançado.ipynb</a> (para pessoas com alguma experiência básica em programação)</li>
+</ul>
+</blockquote>
+<ol start="2">
+<li>Selecione a opção “Abrir com Google Colaboratory”</li>
+<li>Copie o <em>notebook</em> em seu próprio Google Drive (pode-se executar o código sem realizar esta etapa porém as alterações não ficarão salvas se parte do código for modificada) --&gt; “Copiar no Drive”</li>
+<li>Escreva as respostas e o código necessário no mesmo <em>notebook</em>. Você encontrará claramente o local para escrever suas respostas e se elas exigem que determinado código seja escrito ou não</li>
+<li>Exporte o <em>notebook</em> em formato <code>.pdf</code> e envie-o para a plataforma xPRO. Mais informações sobre esta etapa podem ser encontradas na seção “<a href="#entrega">Entrega</a>”</li>
+<li>Após terminar o estudo de caso e enviar seu trabalho para a plataforma online do MIT, o sistema atribuirá a você dois trabalhos de colegas para você revisar. Você deverá avaliar as atividades deles seguindo a <a href="#anexo">rubrica de avaliação</a> disponibilizada. Recomendamos que revise a rubrica agora, para entender como você também será avaliado</li>
+</ol>
+</blockquote>
+<hr>
+<h3 id="introdução">Introdução</h3>
+<p>O objetivo deste estudo é experimentar vários modelos de recomendação para prever as preferências de filmes dos usuários, utilizando um banco de dados de uso livre. Ao concluir, você terá adquirido experiência prática para:</p>
+<ul>
+<li><strong>Carregar</strong> um conjunto de dados grande</li>
+<li><strong>Criar</strong> vários modelos</li>
+<li><strong>Avaliar</strong> as previsões desses modelos</li>
+<li><strong>Utilizar</strong> ferramentas como a validação cruzada para treinar e testar modelos</li>
+<li><strong>Entender</strong> parâmetros como RMSE, precisão e exatidão @k e top n recomendações</li>
+</ul>
+<p>Este documento explicará como trabalhar com esses dados e a estrutura para obter resultados significativos. Não esqueça de salvar seu <em>notebook</em> frequentemente para não perder seu trabalho!</p>
+<h3 id="configuração-do-notebook">Configuração do <em>notebook</em></h3>
+<p>Um dos primeiros passos em qualquer tarefa de ciência de dados é importar as ferramentas necessárias que serão utilizadas. Veja a seção “Importar” do <em>notebook</em> e siga as instruções para importar as bibliotecas necessárias. Além das bibliotecas mais comuns em ciência de dados, como <code>pandas</code> ou <code>matplotlib</code>, este estudo de caso usará a biblioteca [<code>surprise</code>] (<a href="http://surpriselib.com/">http://surpriselib.com/</a>) para gerar os diferentes modelos de recomendação.</p>
+<h3 id="dados">Dados</h3>
+<p>Observe a seção “Dados” do <em>notebook</em> e siga as instruções para carregar o banco de dados <a href="https://movielens.org/">MovieLens</a>, especificamente, a versão <code>ml-100k</code>, que inclui 100.000 pontuações de 1700 filmes.</p>
+<h3 id="validação-cruzada">Validação cruzada</h3>
+<p>A validação cruzada será amplamente usada neste estudo de caso para treinar e avaliar os modelos. Essa estratégia é baseada na ideia de particionar o conjunto de dados em dois subconjuntos de treinamento/teste, com a qual você deve estar familiarizado.</p>
+<p>No entanto, em vez de fazer uma única separação de dados, faremos várias. Cada separação de dados é chamada de “iteração”. Neste estudo de caso, k denota o número de iterações que são usadas; k = 5 é um valor comumente usado.</p>
+<p>Esta imagem fornece uma explicação visual de como funciona a validação cruzada.</p>
+<figure>
+	<img src="https://drive.google.com/uc?export=view&amp;id=1oDTACdJsFT91Q6SWfv2cbAdcIMT_bFfS" width="75%">
+	<figcaption><b>Figura 1.</b> Esquema de funcionamento da validação cruzada.</figcaption>
+</figure>
+<h3 id="modelos-de-recomendação">Modelos de recomendação</h3>
+<h4 id="modelo-1-aleatório">Modelo 1: Aleatório</h4>
+<p>Primeiramente, devemos obter um ponto de referência para nosso modelo. E a melhor maneira fazer isso é com um algoritmo aleatório! Em essência, esse primeiro algoritmo não está personalizado com as preferências de nenhum usuário; a pontuação de filmes só é atribuída às preferências a partir da distribuição inicial dos dados.</p>
+<p>Vá para a seção “Modelo 1: Aleatório” do seu <em>notebook</em> e siga as instruções para criar um novo modelo, treiná-lo com os dados e avaliar seu RMSE.</p>
+<h4 id="modelo-2-filtragem-colaborativa-baseada-no-usuário">Modelo 2: Filtragem colaborativa baseada no usuário</h4>
+<p>É claro que podemos obter algo muito melhor do que uma suposição aleatória de pontuação de filmes! O modelo a seguir usará a noção de similaridade definida pelos usuários para aplicar a filtragem colaborativa (<em>user-user collaborative filtering</em>).</p>
+<p>Vá para a seção “Modelo 2: Filtragem colaborativa baseada no usuário” do seu <em>notebook</em> e siga as instruções para criar um novo modelo, treiná-lo com os dados e avaliar seu RMSE.</p>
+<h4 id="modelo-3-filtragem-colaborativa-baseada-em-itens">Modelo 3: Filtragem colaborativa baseada em itens</h4>
+<p>O modelo a seguir usará a noção de similaridade baseada em itens para mais uma vez aplicar a filtragem colaborativa (<em>item-item collaborative filtering</em>).</p>
+<p>Vá para a seção “Modelo 3: Filtragem colaborativa baseada em itens” do seu notebook e siga as instruções para criar um novo modelo, treiná-lo com os dados e avaliar seu RMSE.</p>
+<h4 id="modelo-4-fatoração-de-matrizes">Modelo 4: Fatoração de matrizes</h4>
+<p>O modelo final neste estudo de caso usará a abordagem da fatoração de matriz com o algoritmo SVD (<em>singular value decomposition</em>) para tentar prever as pontuações dos filmes do usuário. Nesse estudo, tentaremos determinar uma estrutura matemática subjacente na matriz de pontuações do usuário para que ela possa ajudar a prever pontuações ausentes no futuro.</p>
+<p>Vá para a seção “Modelo 4: fatoração de matriz” de seu <em>notebook</em> e siga as instruções para criar um novo modelo, treiná-lo com os dados e avaliar seu RMSE.</p>
+<h3 id="avaliação-dos-modelos---precisão-e-exatidão-k">Avaliação dos modelos - Precisão e exatidão @k</h3>
+<p>O RMSE não é único parâmetro que pode ser utilizado aqui. Também podem ser examinadas duas métricas fundamentais nos sistemas de recomendação: precisão e exatidão (<em>precision and recall</em>). Além disso, acrescentamos um parâmetro <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathnormal" style="margin-right: 0.03148em;">k</span></span></span></span></span> que ajuda na hora de entender problemas com múltiplas saídas de pontuação.</p>
+<p>Vá para a seção “Precisão e exatidão @ <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.69444em; vertical-align: 0em;"></span><span class="mord mathnormal" style="margin-right: 0.03148em;">k</span></span></span></span></span>” do seu <em>notebook</em> e siga as instruções para criar um novo modelo, treiná-lo com os dados e avaliar seu RMSE.</p>
+<h3 id="avaliação-das-top-n-previsões">Avaliação das Top n previsões</h3>
+<p>Finalmente, precisamos ver realmente as pontuações que o modelo prevê para os usuários. Pode-se variar o número de filmes <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.43056em; vertical-align: 0em;"></span><span class="mord mathnormal">n</span></span></span></span></span> recomendados por cada usuário.</p>
+<p>Vá para a seção “Top n previsões” do seu <em>notebook</em> e siga as instruções para calcular as previsões de pontuações para alguns usuários.</p>
+<h3 id="entrega">Entrega</h3>
+<p>Siga estas instruções para enviar suas respostas para a plataforma do MIT.</p>
+<ul>
+<li>
+<p>Converta seu arquivo para o formato <code>.pdf</code>. Há três opções para isso:</p>
+<ul>
+<li>
+<p>Opção 1: acesse a página web: <a href="https://htmtopdf.herokuapp.com/ipynbviewer/">Jupyter Notebooks (ipynb) Viewer and Converter</a>. Após isso, autorize a sincronização com seu Google Drive (<em>Select Files from Google Drive</em>), selecione o <em>notebook</em> que deseja converter para <code>.pdf</code>, e, por último, clique no botão <em>View and Convert</em>. Será gerado um arquivo <code>.pdf</code> que poderá ser baixado.</p>
+</li>
+<li>
+<p>Opção 2: caso tenha o <em>Jupyter Notebooks</em> instalado em seu computador, baixe seu <em>notebook</em> no formato <code>.ipynb</code> e abra-o com o <em>Jupyter Notebooks</em>. Após isso, selecione a opção <em>Baixar como PDF</em>.</p>
+</li>
+<li>
+<p>Opção 3: por último, a opção mais simples, porém menos recomendada. Dentro do próprio Google Colab, selecione a opção “Imprimir” e depois “Salvar como PDF”. Nessa forma, parte das células pode ser cortada, o que pode fazer com que algumas de suas respostas não sejam exibidas corretamente. Verifique se o arquivo foi impresso corretamente caso decida escolher esta opção!</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Nomeie seu arquivo corretamente, no seguinte formato: <code>Sobrenome_Nome_usuariomitxpro.pdf</code>. Por exemplo, se seu nome for Bob Smith e seu nome de usuário do MIT for <code>bobs123</code>, salve seu arquivo com o nome <code>Smith_Bob_bobs123.pdf</code>. Desta forma, os demais participantes e facilitadores do programa poderão identificar o seu trabalho mais facilmente e garantir que você receba o máximo reconhecimento possível.</p>
+</li>
+<li>
+<p>Envie seu arquivo. Para isso, vá para a página de avaliação do estudo de caso. Você deverá ver uma página como esta:</p>
+</li>
+</ul>
+<figure>
+	<img src="https://drive.google.com/uc?export=view&amp;id=1nAAUnxEP6wLUM0QPopjvoPWxOKKMG-wG" width="75%">
+	<figcaption><b></b></figcaption>
+</figure>
+<ul>
+<li>
+<p>Pode deixar o campo “Sua resposta” em branco.</p>
+</li>
+<li>
+<p>Clique no botão “<em>Selecionar arquivos</em>” e selecione o arquivo em seu computador (o arquivo que você nomeou adequadamente na etapa anterior).</p>
+</li>
+<li>
+<p>Na caixa de texto “Descrever”, digite o nome do seu arquivo (por exemplo, <code>Smith_Bob_bobs123.pdf</code>).</p>
+</li>
+<li>
+<p>Clique no botão “Salvar seu progresso”.</p>
+</li>
+<li>
+<p>Em seguida, clique no botão “Carregar arquivos”.</p>
+</li>
+<li>
+<p>Você pode carregar o estudo de caso quantas vezes quiser antes de entregá-lo definitivamente.</p>
+</li>
+<li>
+<p>Quando tiver certeza de que seu último arquivo foi carregado, clique no botão que diz “Publique sua resposta e continue para a próxima etapa”.</p>
+</li>
+</ul>
+<h3 id="etapas-seguintes">Etapas seguintes</h3>
+<p>Lembre-se: após enviar seu trabalho, o sistema lhe atribuirá outros participantes para que você revise as atividades deles.</p>
+<p>Se o sistema não atribuir imediatamente um participante para você revisar, verifique novamente a página para ver se alguma nova revisão foi atribuída a você. Pode levar algumas horas até que uma nova avaliação lhe seja atribuída.</p>
+<br>
+<h1 id="anexo">Anexo</h1>
+<h2 id="rubrica-para-fazer-a-avaliação-dos-colegas">Rubrica para fazer a avaliação dos colegas</h2>
+<p>Siga a rubrica abaixo para avaliar o envio do estudo de caso de um colega. Os números das perguntas abaixo correspondem aos números das respostas apresentadas. Caso tenha duvidas ou queira fazer algum comentário sobre este processo, vá para o espaço do Slack ou consulte os facilitadores em particular. Estamos aqui para te ajudar! Boa sorte!</p>
+<ol>
+<li><strong>Os dados foram carregados com sucesso e foi incluído um histograma da distribuição das pontuações?</strong></li>
+</ol>
+<ul>
+<li><em>Incompleto</em>: Não aparece nenhum código ou não é possível carregar os dados. --&gt; 0 PONTO</li>
+<li><em>Parcialmente completo</em>: É fornecido um código, mas o histograma da distribuição da pontuação parece estar errado ou ausente (a distribuição correta deve ter principalmente pontuações de 3 e 4 pontos). --&gt; 2 PONTOS</li>
+<li><em>Completo</em>: O código carrega corretamente os dados e é fornecido um histograma com algumas explicações adicionais sobre o conjunto de dados. --&gt; 3 PONTOS</li>
+</ul>
+<ol start="2">
+<li><strong>Os modelos de usuário-usuário/item-item foram comparados com sucesso?</strong></li>
+</ol>
+<ul>
+<li><em>Incompleto</em>: Não houve nenhuma resposta ou a pergunta em questão não foi respondida. --&gt; 0 PONTO</li>
+<li><em>Parcialmente completo</em>: Houve uma tentativa razoável de explicar os resultados dos modelos, mas parte da pergunta parece ter sido esquecida. --&gt; 2 PONTOS</li>
+<li><em>Completo</em>: A pergunta foi respondida integralmente, destacando o desempenho entre os modelos usuário-usuário/item-item e também observando que esses dois modelos são significativamente melhores do que o modelo aleatório em termos de RMSE (raiz quadrada do EQM). --&gt; 3 PONTOS</li>
+</ul>
+<ol start="3">
+<li><strong>O modelo de fatoração de matriz foi comparado com sucesso com os modelos anteriores?</strong></li>
+</ol>
+<ul>
+<li><em>Incompleto</em>: Não houve nenhuma resposta ou a pergunta em questão não foi respondida. --&gt; 0 PONTO</li>
+<li><em>Parcialmente completo</em>: Houve uma tentativa razoável de explicar os resultados do modelo, mas parte da pergunta parece ter sido esquecida. --&gt; 2 PONTOS</li>
+<li><em>Completo</em>: A pergunta foi completamente respondida, destacando a diferença na estrutura entre os modelos usuário-usuário/item-item (usando uma fatoração de matriz de baixa classificação em vez da similaridade de outros usuários/itens) e também observando que este novo modelo é significativamente melhor do que o modelo aleatório em termos de RMSE (raiz quadrada do EQM). --&gt; 3 PONTOS</li>
+</ul>
+<ol start="4">
+<li><strong>Os dados de precisão/exatidão dos 4 modelos foram calculados corretamente?</strong></li>
+</ol>
+<ul>
+<li><em>Incompleto</em>: Não há nenhum dado ou código incluído. --&gt; 0 PONTOS</li>
+<li><em>Fraco</em>: Foram fornecidos alguns dados, mas não foram incluídos valores corretos/válidos para a precisão e a exatidão (deveriam estar entre 0 e 1)  --&gt; 1 PONTO</li>
+<li><em>Muito bom</em>: Há um código e/ou dados com entradas corretas para a precisão e a exatidão para os quatro modelos. --&gt; 3 PONTOS</li>
+</ul>
+<ol start="5">
+<li><strong>Foram incluídas as top n recomendações, para pelo menos um usuário, para um certo valor de n?</strong></li>
+</ol>
+<ul>
+<li><em>Fraco</em>: Não foram incluídos nenhum código ou trabalho --&gt; 0 PONTOS</li>
+<li><em>Bom</em>: Foi incluído um código, mas as funções adequadas não foram usadas corretamente para obter os melhores filmes para um determinado usuário. --&gt; 1 PONTO</li>
+<li><em>Muito bom</em>: Foram incluídos o código correto e as operações lógicas para gerar as top n previsões de filmes para um usuário, com um valor razoável de n --&gt; 3 PONTOS</li>
+</ul>
+<hr>
+<h3 id="perguntas-frequentes">Perguntas frequentes</h3>
+<p>A seguir estão algumas das perguntas mais frequentes feitas pelos participantes e suas respectivas respostas. Esta lista está sujeita a alterações.</p>
+<p><strong>P</strong>: Ocorre um erro dizendo que a solicitação é muito longa e meu <em>notebook</em> não carrega. O que devo fazer?<br>
+<strong>R</strong>: Tente limpar a cache e os cookies do seu navegador. Esta página tem um tutorial de como fazer isso.</p>
+<p><strong>P</strong>: Aparece um erro quando tento instalar a surpriselib: “<em>grpcio 1.11.0 has requirement protobuf&gt;=3.5.0.post1, but you’ll have protobuf 3.4.1 which is incompatible</em>”. O que devo fazer?<br>
+<strong>R</strong>: Não se preocupe! Isso não é um erro; é apenas um aviso. (Sabemos que o texto em vermelho é irritante). Se você consegue continuar executando as células seguintes, depois que a instalação for concluída, então está tudo bem.</p>
+<p><strong>P</strong>: Vejo muito texto em vermelho quando executo uma célula. Parece que há um erro. Isso significa que meu código não está funcionando?<br>
+<strong>R</strong>: Não, é normal! São apenas mensagens de aviso do código. Se a célula puder ser executada e você receber uma mensagem de que deu tudo certo, então não há problema!</p>
+<p><strong>P</strong>:  Não consigo fazer meu código funcionar. Sempre me aparece um erro de pacote ou algum outro tipo de erro que não consigo resolver. O que devo fazer?<br>
+<strong>R</strong>: Consulte a seção de resolução de problemas a seguir para obter ajuda.</p>
+<p><strong>P</strong>: Os números que obtive no estudo de caso variam um pouco dos número que outros obtiveram. É normal?<br>
+<strong>R</strong>: Sim, é super normal! Tem a ver com a forma em que se separa aleatoriamente ou a forma em que se treina o modelo em função dos dados. Se seus números estiverem razoavelmente próximos dos valores dos outros, então está certo. Além disso, observe que os valores de R e Python podem variar entre si, devido aos algoritmos específicos usados ​​por cada linguagem. Isso é totalmente aceitável desde que você tenha códigos e resultados para apoiar seus resultados.</p>
+<p><strong>P</strong>: A imagem do histograma não aparece no <em>notebook</em> de R quando eu gero a saída HTML. O que está ocorrendo?<br>
+<strong>R</strong>: Este é um problema do <em>Jupyter Notebooks</em>; não é um erro seu. Não se preocupe. Foi adicionada uma observação à rubrica de avaliação para que você receba total reconhecimento por seu trabalho.</p>
+<p><strong>P</strong>: O prazo está terminando está sendo difícil para mim avançar na tarefa. Posso solicitar uma extensão do prazo? O que devo fazer?<br>
+<strong>R</strong>: Infelizmente, devido à natureza do curso, a política oficial é a de não conceder extensões para tarefas avaliativas. No entanto, incentivamos que você entregue o que já tiver feito. Se estiver preocupado com sua nota, entre em contato conosco.</p>
+<hr>
+<h3 id="resolução-de-problemas">Resolução de problemas</h3>
+<p>Está tendo problemas para executar seu código? Tem dúvidas sobre uma parte específica do estudo de caso? Não consegue enviar sua tarefa ao MIT? Os facilitadores estão aqui para ajudá-lo!</p>
+<p>Siga estas etapas caso esteja tendo problemas para avançar.</p>
+<ul>
+<li>Certifique-se de ter seguido todas as instruções exatamente conforme especificadas.</li>
+<li>Veja se sua pergunta já foi respondida no espaço do Slack habilitado para o curso.</li>
+<li>Escreva no espaço do Slack no canal correspondente ou fale diretamente com seu facilitador.</li>
+</ul>
+<hr>
+<img src="https://drive.google.com/uc?export=view&amp;id=1du2bbjAM4VMziHc2jl9Etk7q26IxuLyy">
+<p>©2021 Massachusetts Institute of Technology</p>
+<!--stackedit_data:&#10;eyJoaXN0b3J5IjpbNjMyNDM5ODMsLTE0MTcyNzMxODksMTQxNj&#10;c4MjI2OCw2MjIwNjY3OTYsLTYyNzc4ODY5MSw3MzA5OTgxMTZd&#10;fQ==&#10;-->
+</div>
+</body>
+
+</html>
