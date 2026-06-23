@@ -19,14 +19,14 @@ Não se trata de uma aplicação única: cada notebook é uma atividade relativa
 
 ## 🧭 Conteúdo
 
-### 1️⃣ Módulo 1 — Aprendizado não supervisionado
+### 🧩 Módulo 1 — Aprendizado não supervisionado
 
 - **PCA e K-Means em dados genômicos:** redução da quantidade de variáveis com Análise de Componentes Principais (PCA) e identificação de grupos semelhantes com K-Means, sem utilizar rótulos previamente definidos.
 - **Alocação Latente de Dirichlet (LDA):** descoberta automática dos assuntos presentes em uma coleção de textos por meio da frequência e da distribuição das palavras.
 - **Identificação facial com PCA e *eigenfaces*:** representação compacta de imagens de rostos, permitindo reconstruí-las e comparar uma nova face com as existentes.
 - **Agrupamento espectral de notícias:** transformação de notícias em atributos numéricos e formação de grupos de textos com conteúdo semelhante.
 
-### 2️⃣ Módulo 2 — Regressão, previsão e inferência causal
+### 📈 Módulo 2 — Regressão, previsão e inferência causal
 
 - **Previsão de salários:** uso de regressão para estimar salários a partir de características observadas e avaliação da capacidade do modelo de generalizar para novos dados.
 - **Diferença salarial entre homens e mulheres:** investigação da desigualdade salarial com regressão linear, controlando outras características que também influenciam a remuneração.
@@ -34,24 +34,24 @@ Não se trata de uma aplicação única: cada notebook é uma atividade relativa
 - **Modelos lineares e não lineares:** comparação entre modelos com diferentes níveis de flexibilidade e estudo do efeito do particionamento dos dados e da combinação de previsões.
 - **Porte de armas e taxas de homicídio:** aplicação de métodos estatísticos para estimar uma possível relação causal, distinguindo correlação de causalidade e considerando fatores de confusão.
 
-### 3️⃣ Módulo 3 — Classificação e redes neurais
+### 🧠 Módulo 3 — Classificação e redes neurais
 
 - **Lançamento do Challenger:** modelagem da probabilidade de falha dos anéis de vedação em função da temperatura, mostrando como uma análise preditiva poderia apoiar a decisão de lançamento.
 - **Limites de decisão com redes neurais:** uso de redes neurais profundas para separar classes quando a relação entre os dados não pode ser representada adequadamente por uma fronteira linear.
 
-### 4️⃣ Módulo 4 — Sistemas de recomendação
+### 🎯 Módulo 4 — Sistemas de recomendação
 
 - **Recomendação de filmes:** construção e comparação de recomendadores aleatórios, baseados em usuários, baseados em itens e em fatoração de matrizes.
 - **Recomendação de músicas:** geração de sugestões personalizadas a partir das preferências e dos padrões de consumo dos usuários.
 - **Recomendação de produtos:** aplicação das mesmas ideias ao comércio, estimando quais produtos têm maior chance de interessar a cada cliente.
 - **Avaliação dos recomendadores:** uso de métricas como precisão e *recall* para verificar a qualidade das listas de recomendações mais relevantes.
 
-### 5️⃣ Módulo 5 — Filtros de Kalman e rastreamento
+### 📍 Módulo 5 — Filtros de Kalman e rastreamento
 
 - **Rastreamento de um objeto em movimento:** combinação de previsões do movimento com medições ruidosas para estimar continuamente a posição e a velocidade reais de um objeto.
 - **Filtro de Kalman em três dimensões:** extensão do rastreamento para os eixos X, Y e Z, atualizando o estado estimado à medida que novas observações são recebidas.
 
-### 6️⃣ Módulo 6 — Engenharia de atributos e modelos preditivos
+### ⚙️ Módulo 6 — Engenharia de atributos e modelos preditivos
 
 - **Corridas de táxi em Nova York:** organização de tabelas relacionadas e criação de variáveis para prever comportamentos com base no histórico das corridas.
 - **Engenharia automatizada de atributos:** uso do Featuretools para produzir atributos por transformação e agregação, reduzindo parte do trabalho manual de preparação dos dados.
