@@ -59,8 +59,6 @@ Os nomes seguem o padrão **tipo + número do estudo + tema**, facilitando a ass
 - `Exportação em PDF`: cópia de um notebook exportada para consulta.
 - `Material do curso`: documentos gerais que não pertencem a um estudo específico.
 
-O certificado de conclusão, nos formatos PDF e PNG, está armazenado na raiz do repositório.
-
 ## Tecnologias utilizadas
 
 Os notebooks usam principalmente Python e bibliotecas como:
